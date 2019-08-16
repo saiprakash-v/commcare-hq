@@ -14,8 +14,6 @@ from corehq.apps.hqadmin.views.reports import (
     DimagisphereView,
     DownloadGIRView,
     DownloadMALTView,
-    admin_reports_stats_data,
-    stats_data,
     top_five_projects_by_country,
 )
 from corehq.apps.hqadmin.views.system import (
