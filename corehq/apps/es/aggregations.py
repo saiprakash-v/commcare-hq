@@ -507,15 +507,6 @@ class RangeAggregation(Aggregation):
         return self
 
 
-class HistogramResult(BucketResult):
-
-    def as_facet_result(self):
-        return [
-            {'time': b.key, 'count': b.doc_count}
-            for b in self.buckets_list
-        ]
-
-
 class DateHistogram(Aggregation):
     """
     Aggregate by date range.  This can answer questions like "how many forms
@@ -530,7 +521,7 @@ class DateHistogram(Aggregation):
     :param timezone: do bucketing using this time zone instead of UTC
     """
     type = "date_histogram"
-    result_class = HistogramResult
+    result_class = BucketResult
 
     def __init__(self, name, datefield, interval, timezone=None):
         self.name = name
