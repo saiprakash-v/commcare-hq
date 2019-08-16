@@ -15,16 +15,14 @@ from corehq.apps.app_manager.dbaccessors import domain_has_apps
 from corehq.apps.users.util import WEIRD_USER_IDS
 from corehq.apps.es.sms import SMSES
 from corehq.apps.es.forms import FormES
-from corehq.apps.hqadmin.reporting.reports import (
-    get_mobile_users,
-)
+from corehq.apps.data_analytics.esaccessors import get_mobile_users
 from couchforms.analytics import get_number_of_forms_in_domain, \
     domain_has_submission_in_last_30_days, get_first_form_submission_received, \
     get_last_form_submission_received
 
 from corehq.apps.domain.models import Domain
 from corehq.apps.users.models import CouchUser
-from corehq.elastic import es_query, ADD_TO_ES_FILTER
+from corehq.elastic import es_query
 from dimagi.utils.parsing import json_format_datetime
 from corehq.apps.userreports.util import number_of_report_builder_reports, number_of_ucr_reports
 from corehq.apps.sms.models import SQLMobileBackend
