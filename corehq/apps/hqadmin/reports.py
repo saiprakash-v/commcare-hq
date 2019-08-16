@@ -24,8 +24,7 @@ from corehq.util.python_compatibility import soft_assert_type_text
 
 class AdminReport(GenericTabularReport):
     dispatcher = AdminReportDispatcher
-
-    base_template = "hqadmin/faceted_report.html"
+    base_template = 'reports/base_template.html'
     report_template_path = "reports/tabular.html"
     section_name = ugettext_noop("ADMINREPORT")
     default_params = {}
@@ -33,8 +32,6 @@ class AdminReport(GenericTabularReport):
 
 
 class DeviceLogSoftAssertReport(BaseDeviceLogReport, AdminReport):
-    base_template = 'reports/base_template.html'
-
     slug = 'device_log_soft_asserts'
     name = ugettext_lazy("Global Device Logs Soft Asserts")
 
@@ -147,8 +144,6 @@ class AdminPhoneNumberReport(PhoneNumberReport):
 
 
 class UserAuditReport(AdminReport, DatespanMixin):
-    base_template = 'reports/base_template.html'
-
     slug = 'user_audit_report'
     name = ugettext_lazy("User Audit Events")
 
