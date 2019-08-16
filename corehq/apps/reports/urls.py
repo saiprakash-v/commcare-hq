@@ -20,7 +20,6 @@ from corehq.apps.userreports.views import (
 )
 
 from .dispatcher import (
-    BasicReportDispatcher,
     CustomProjectReportDispatcher,
     ProjectReportDispatcher,
 )
@@ -151,10 +150,6 @@ urlpatterns = [
     url(r'^custom/', include(custom_report_urls)),
     url(r'^filters/', include(filter_urls)),
     ProjectReportDispatcher.url_pattern(),
-]
-
-report_urls = [
-    BasicReportDispatcher.url_pattern(),
 ]
 
 for module in get_installed_custom_modules():
