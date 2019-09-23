@@ -228,7 +228,7 @@ def view_generic(request, domain, app_id, module_id=None, form_id=None,
         }
         context.update({
             'multimedia': {
-                "object_map": app.get_object_map(),
+                "object_map": app.get_object_map(), # TODO: should this only contain media relevant to this module/form?
                 'upload_managers': uploaders,
                 'upload_managers_js': {type: u.js_options for type, u in uploaders.items()},
             }
@@ -236,10 +236,12 @@ def view_generic(request, domain, app_id, module_id=None, form_id=None,
         context['module_icon'] = None
         if toggles.CUSTOM_ICON_BADGES.enabled(domain):
             context['module_icon'] = module.custom_icon if module.custom_icon else CustomIcon()
+        '''
         try:
-            context['multimedia']['references'] = app.get_references()
+            context['multimedia']['references'] = app.get_references()      # TODO: what is this used for?
         except ReportConfigurationNotFoundError:
             pass
+        '''
         context['nav_menu_media_specifics'] = specific_media
 
     error = request.GET.get('error', '')
