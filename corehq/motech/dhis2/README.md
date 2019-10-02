@@ -4,11 +4,13 @@ MOTECH's DHIS2 Module
 See the [MOTECH README](../README.md#dhis2-module) for a brief
 introduction to DHIS2 in the context of MOTECH.
 
-MOTECH currently supports two ways of integrating with DHSI2: Forwarding
-aggregated data as DHIS2 DataSets; and forwarding form question values
-as DHIS2 Anonymous Events.
+MOTECH supports three ways of integrating with DHIS2:
+* Forwarding aggregated data as DHIS2 DataSets
+* Forwarding form question values as DHIS2 Anonymous Events
+* Forwarding cases as DHIS2 Tracked Entity Instances, along with form
+  question values as events of those instances.
 
-Use the "Enable DHIS2 integration" feature flag for both.
+Use the "Enable DHIS2 integration" feature flag to enable these.
 
 
 Logging
@@ -214,3 +216,274 @@ payloads are forwarded every four minutes. To send it immediately, click
 
 Check **Project Settings** > **MOTECH Logs** to inspect the requests
 sent to DHIS2, and the responses from DHIS2.
+
+
+Tracked Entities
+----------------
+
+DHIS2 *tracked entity instances* are analogous to CommCare *cases*.
+
+*Tracked entity types* are like *case types*, and are used for tracking
+people, buildings, equipment, lab samples, etc.
+
+*Tracked entity attributes* are the same as *case properties*. In
+CommCare you don't have to define them, but you can using the Data
+Dictionary. In DHIS2 you do have to define them.
+
+Events are categorised into programs. There are two kinds of programs:
+* Tracker programs, where events are associated with a tracked entity
+  instance. MOTECH supports integrating CommmCare data with tracker
+  programs by forwarding cases to DHIS2 as tracked entity instances,
+  along with the data from the forms that register or update those
+  cases.
+* Event programs, where events are not associated with a tracked entity
+  instance. MOTECH supports integrating CommmCare data with event
+  programs by forwarding forms to DHIS2 as anonymous events.
+
+Tracked entity API requests include the same kind of data as anonymous
+event API requests, and also include case property data.
+
+
+### Getting Started
+
+A good way to see how DHIS2 Tracked Entity integration works is to
+create a simple app and send data to DHIS2's demo server. The demo
+server has useful sample data, and it gets reset every 24 hours so you
+have a fresh environment to work with.
+
+
+#### Explore DHIS2
+
+We will use the DHIS2 MNCH program as an example. Open 
+https://play.dhis2.org/ in your browser and choose "Stable demo". Log in
+with the username "admin" and the password "district". The dashboard
+page will appear.
+
+Click the grid icon / Rubik's cube in the top right, and choose
+"Maintenance". This is where we can find details of the program that we
+want to build an app for. Select the "Program" tab at the top. In the
+"Program" box, click the "List" icon.
+
+Choose the "MNCH / PNC (Adult Woman)" tracker program from the list.
+Among the program details you can see that the tracked entity type is
+given as "Person".
+
+Take a look at the URL in your browser. It ends with
+"/program/uy2gU8kT1jF". "uy2gU8kT1jF" is the ID of the program. The
+browser URL is a simple way of finding the ID of just about anything in
+DHIS2. We will need IDs to configure the integration.
+
+Click "Enrollment details" at the top. Note that the "incident date" is
+given as "LMP Date". Our app will need to collect this date in a form.
+
+Click "Attributes" at the top. You will find the
+"program tracked entity attributes". These are the case properties that
+we will want to include in our app. The searchable tracked entity
+attributes will be useful for finding existing tracked entity instances,
+and those should be in our app's registration form.
+
+Click "Program stages" at the top. Program stages could correspond to
+different forms in our app. To get started we will just create a form
+for "ANC 1st visit". Select it, scroll down and click "Assign data
+elements". You will find a list of possible form questions. Note that
+for ANC 1, none of them are marked as compulsory. If any were, those
+ones would have to be included in our form. For simplicity, we will just
+include "MCH Visit Comment".
+
+
+#### Create a basic CommCare app
+
+We will create a small CommCare app with just one case list menu, a form
+to register a woman, and a follow-up form for an ANC 1 visit.
+
+If your project space has the Data Dictionary available, it would be a
+good place to start because we know the case properties already.
+
+Create a new app, add a case list menu. In "Registration Form", add
+questions for given name, family name, and date of birth. ("Unique ID"
+is another attribute of the Person tracked entity type, but it is not
+mandatory so we can skip it.) Make a hidden a question for the case's
+name that joins given name and family name. e.g.
+`join(' ', #form/given_name, upper-case(#form/family_name))`
+
+In "Followup Form", add questions for "LMP Date", "Visit Comment" and
+the rest of the case properties.
+
+
+#### Configure the integration
+
+Navigate to "Project Settings" > "Data Forwarding". Under "Forward Cases
+as DHIS2 Tracked Entities" click "Add a forwarding location".
+
+Set "URL to forward to" to the URL for the DHIS2 stable demo, which at
+the time of writing is "https://play.dhis2.org/2.31.5/". "Authentication
+protocol" is "Basic", and "Username" and "Password" are "admin" and
+"district" respectively.
+
+Click "Start forwarding".
+
+On the "Data Forwarding" page, under "Forward Cases as DHIS2 Tracked
+Entities", you will now find a row for "play.dhis2.org". Click the
+"Configure" button to the right of it.
+
+Paste the following into "Case config":
+```json
+{
+  "doc_type": "Dhis2CaseConfig",
+  "case_type": "case",
+  "te_type_id": "nEenWmSyUEp",
+  "tei_id": {
+    "doc_type": "CaseProperty",
+    "case_property": "dhis2_tei_id"
+  },
+  "org_unit_id": {
+    "doc_type": "CaseOwnerAncestorLocationField",
+    "location_field": "dhis_id"
+  },
+  "attributes": {
+    "w75KJ2mc4zz": {
+      "doc_type": "CaseProperty",
+      "case_property": "given_name"
+    },
+    "zDhUuAYrxNC": {
+      "doc_type": "CaseProperty",
+      "case_property": "family_name"
+    },
+    "iESIqZ0R0R0": {
+      "doc_type": "CaseProperty",
+      "case_property": "date_of_birth"
+    }
+  },
+  "finder_config": {
+    "property_weights": [
+      {
+        "case_property": "given_name",
+        "weight": "0.35"
+      },
+      {
+        "case_property": "family_name",
+        "weight": "0.55"
+      },
+      {
+        "case_property": "date_of_birth",
+        "weight": "0.1"
+      }
+    ],
+    "confidence_margin": "0.5"
+  },
+  "form_configs": [
+    {
+      "doc_type": "Dhis2FormConfig",
+      "xmlns": "http://openrosa.org/formdesigner/F850C145-D805-4B35-925B-A7D35141FD13",
+      "program_id": "uy2gU8kT1jF",
+      "program_stage_id": {
+        "doc_type": "ConstantString",
+        "value": "eaDHS084uMp"
+      },
+      "org_unit_id": {
+        "location_field": "dhis_id",
+        "doc_type": "FormUserAncestorLocationField"
+      },
+      "event_date": {
+        "form_question": "/data/lmp_date",
+        "doc_type": "FormQuestion"
+      },
+      "event_status": "ACTIVE",
+      "datavalue_maps": [
+        {
+          "data_element_id": "OuJ6sgPyAbC",
+          "value": {
+            "doc_type": "FormQuestion",
+            "form_question": "/data/visit_comment"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+That looks long, so let us break it down, and go through each chunk.
+
+MOTECH supports integrating more than one case type with a DHIS2 server,
+but to start we will just configure one. "case type" is set to "case",
+which is the initial case type for a case list menu. Normally it would
+make sense for this case type to have the same or a similar name as the
+tracked entity type, like "person", or "mother".
+
+"te_type_id" is "nEenWmSyUEp". This is the ID of the tracked entity
+type, "Person".
+
+Next is "tei_id". This is the case property that will store the ID of
+the tracked entity instance. The next time that the case is forwarded to
+DHIS2, MOTECH will use the value of this case property to retrieve the
+tracked entity instance immediately, and avoid having to search DHIS2
+for it again.
+
+"org_unit_id" specifies how MOTECH should determine the ID of the DHIS2
+location that this request applies to. DHIS2 is often used on a national
+scale, so everything needs to be associated with a location. For
+CommCare projects that are specific to a small geographical location the
+org unit could be a constant. But usually we will look it up based on
+the location of the mobile worker who submitted the form, or the
+location of the mobile worker, group or location that owns the case. In
+this example we are using the case owner. MOTECH will look at the
+location metadata for the field named "dhis_id", and use the value it
+finds there. If it does not find a value, it will check the next
+ancestor location until it finds a value. (If it gets to the top of the
+location hierarchy without finding a value, it will leave out the
+org_unit_id from the request. If the org unit is required then the
+request will fail.)
+
+The "attributes" dictionary is keyed on the IDs of tracked entity
+attributes in DHIS2, and maps them to their corresponding case
+properties. This is how MOTECH determines which attributes to update
+when registering or updating a tracked entity instance. You can use case
+properties or constants, but it is not recommended to use form
+questions because if the case is updated by a form that is missing that
+question, DHIS2 will remove the value of the attribute from the tracked
+entity instance instead of leaving it the same.
+
+"finder_config" manages the configuration of how MOTECH searches DHIS2
+to find a matching tracked entity instance for a case.
+
+Each case property that is used to determine a match is assigned a
+weight. The case is compared with the search results, and the weights of
+each case property that matches the corresponding attribute of a tracked
+entity instance are added together to come up with a score for that
+tracked entity instance. If the score is 1.0 or more then that tracked
+entity instance is considered a candidate. Usually there is only one
+candidate. But if there is more than one, MOTECH compares the scores of
+the top candidates, and if the score of the first candidate is much
+higher than the rest, then that candidate is considered a match.
+"confidence_margin" sets how much higher the top score needs to be from
+the second best score. But if the candidates' scores are too close to
+call, then MOTECH does not guess. An error is raised and that case is
+not forwarded to DHIS2.
+
+"form_configs" reuses the configuration that MOTECH uses to send forms
+to DHIS2 as Events. "xmlns" identifies the form, and "program_id" is the
+ID of the DHIS2 Program the events belong to. If the program has more
+than one stage, the program stage that the event is for must also be
+given. This is usually a "ConstantString", but it could potentially come
+from a form question value.
+
+"event_date" is the date of the start of the event. "event_status" is
+one of "ACTIVE", "COMPLETED", "VISITED", "SCHEDULED", "OVERDUE" or
+"SKIPPED".
+
+And lastly, "datavalue_maps" sets DHIS2 data element values. In this
+example we are only collecting one, but setting data element values is
+the reason we send Events to DHIS2, and usually there will be many.
+
+Save the configuration by clicking "Update DHIS2 Tracked Entity
+configuration".
+
+
+#### Test
+
+To test our configuration, open the app in App Preview and register a
+woman.
+
+Then click on "MOTECH Logs" and confirm the requests sent to DHIS2 all
+succeeded.
