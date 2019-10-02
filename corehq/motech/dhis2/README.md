@@ -88,12 +88,19 @@ CommCare form data can be sent to DHIS2 as Anonymous Events. Form data
 will be sent as forms are submitted.
 
 This is configured under **Project Settings** > **Data Forwarding** >
-**Forward to DHIS2**.
+**Forward Forms to DHIS2 as Anonymous Events**.
 
 If it is not already defined, add a forwarding location. (This is
 sometimes refered to as a "forwarder", and in the source code it is a
 [`Dhis2Repeater`](./repeaters.py).) Enter the details of the DHIS2
-server. When you are done, click "Start Forwarding".
+server.
+
+**NOTE**: The value for "**URL to forward to**" should not include the
+"api" part of the URL. For example, if you are testing using the DHIS2
+demo server, the URL might be something like,
+"https://play.dhis2.org/2.31.5/".
+
+When you are done, click "Start Forwarding".
 
 To configure the integration, click "Configure".
 
@@ -117,8 +124,8 @@ definitions. The following is an example:
         },
         "event_status": "COMPLETED",
         "org_unit_id": {
-          "doc_type": "ConstantString",
-          "value": "NwGKQaHk5mx",
+          "doc_type": "FormUserAncestorLocationField",
+          "location_field": "dhis_id",
         },
         "datavalue_maps": [
           {
