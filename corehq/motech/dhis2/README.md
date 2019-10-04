@@ -115,12 +115,12 @@ definitions. The following is an example:
         "program_id": "WomWTaHk5mx",
         "event_date": {
           "doc_type": "FormQuestion",
-          "form_question": "/data/event_date",
+          "form_question": "/data/event_date"
         },
         "event_status": "COMPLETED",
         "org_unit_id": {
           "doc_type": "ConstantString",
-          "value": "NwGKQaHk5mx",
+          "value": "NwGKQaHk5mx"
         },
         "datavalue_maps": [
           {
