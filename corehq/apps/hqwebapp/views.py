@@ -85,6 +85,7 @@ from corehq.apps.hqwebapp.encoders import LazyEncoder
 from corehq.apps.hqwebapp.forms import (
     CloudCareAuthenticationForm,
     EmailAuthenticationForm,
+    EmailAuthenticationFormForMobile
 )
 from corehq.apps.hqwebapp.utils import (
     get_environment_friendly_name,
