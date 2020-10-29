@@ -124,7 +124,6 @@ FORMPLAYER_TIMING_FILE = "%s/%s" % (FILEPATH, "formplayer.timing.log")
 FORMPLAYER_DIFF_FILE = "%s/%s" % (FILEPATH, "formplayer.diff.log")
 SOFT_ASSERTS_LOG_FILE = "%s/%s" % (FILEPATH, "soft_asserts.log")
 MAIN_COUCH_SQL_DATAMIGRATION = "%s/%s" % (FILEPATH, "main_couch_sql_datamigration.log")
-ES_INTERFACE_LOG_FILE = "%s/%s" % (FILEPATH, "es_interface.log")
 
 LOCAL_LOGGING_CONFIG = {}
 
@@ -314,7 +313,6 @@ HQ_APPS = (
     'corehq.messaging.smsbackends.test',
     'corehq.apps.registration',
     'corehq.messaging.smsbackends.unicel',
-    'corehq.messaging.smsbackends.icds_nic',
     'corehq.messaging.smsbackends.vertex',
     'corehq.messaging.smsbackends.start_enterprise',
     'corehq.messaging.smsbackends.ivory_coast_mtn',
@@ -372,6 +370,7 @@ HQ_APPS = (
     'custom.nic_compliance',
     'custom.hki',
     'custom.champ',
+    'custom.covid',
     'custom.aaa',
     'custom.inddex',
 
@@ -1014,7 +1013,6 @@ CUSTOM_LANDING_TEMPLATE = {
     # "default": 'login_and_password/login.html',
 }
 
-ENABLE_ES_INTERFACE_LOGGING = False
 ES_SETTINGS = None
 ES_XFORM_INDEX_NAME = "xforms_2016-07-07"
 ES_XFORM_DISABLE_ALL = False
@@ -1065,6 +1063,12 @@ DEFAULT_COMMCARE_EXTENSIONS = [
     "custom.succeed.commcare_extensions",
 ]
 COMMCARE_EXTENSIONS = []
+
+IGNORE_ALL_DEMO_USER_SUBMISSIONS = False
+
+# to help in performance, avoid use of phone entries in an environment that does not need them
+# so HQ does not try to keep them up to date
+USE_PHONE_ENTRIES = True
 
 try:
     # try to see if there's an environmental variable set for local_settings
@@ -1252,14 +1256,6 @@ LOGGING = {
             'maxBytes': 10 * 1024 * 1024,  # 10 MB
             'backupCount': 20  # Backup 200 MB of logs
         },
-        'es_interface-handler': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'verbose',
-            'filename': ES_INTERFACE_LOG_FILE,
-            'maxBytes': 10 * 1024 * 1024,  # 10 MB
-            'backupCount': 20  # Backup 200 MB of logs
-        },
         'couch-request-handler': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -1418,12 +1414,7 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'ERROR',
             'propagate': False,
-        },
-        'es_interface': {
-            'handlers': ['es_interface-handler'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
+        }
     }
 }
 
@@ -1630,7 +1621,6 @@ SMS_LOADED_SQL_BACKENDS = [
     'corehq.messaging.smsbackends.apposit.models.SQLAppositBackend',
     'corehq.messaging.smsbackends.grapevine.models.SQLGrapevineBackend',
     'corehq.messaging.smsbackends.http.models.SQLHttpBackend',
-    'corehq.messaging.smsbackends.icds_nic.models.SQLICDSBackend',
     'corehq.messaging.smsbackends.mach.models.SQLMachBackend',
     'corehq.messaging.smsbackends.megamobile.models.SQLMegamobileBackend',
     'corehq.messaging.smsbackends.push.models.PushBackend',

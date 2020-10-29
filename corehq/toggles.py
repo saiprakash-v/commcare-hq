@@ -851,6 +851,7 @@ FORM_LINK_WORKFLOW = StaticToggle(
     'Form linking workflow available on forms',
     TAG_SOLUTIONS_CONDITIONAL,
     [NAMESPACE_DOMAIN],
+    help_link='https://confluence.dimagi.com/display/ccinternal/Form+Link+Workflow+Feature+Flag',
 )
 
 SECURE_SESSION_TIMEOUT = StaticToggle(
@@ -1338,6 +1339,7 @@ VIEW_APP_CHANGES = StaticToggle(
     'Improved app changes view',
     TAG_SOLUTIONS_OPEN,
     [NAMESPACE_DOMAIN, NAMESPACE_USER],
+    help_link="https://confluence.dimagi.com/display/ccinternal/Viewing+App+Changes+between+versions",
 )
 
 COUCH_SQL_MIGRATION_BLACKLIST = StaticToggle(
