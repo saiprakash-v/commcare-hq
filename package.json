@@ -51,7 +51,7 @@
         "detectrtc": "1.4.0",
         "fast-levenshtein": "2.0.6",
         "font-awesome": "4.7.0",
-        "intl-tel-input": "9.0.7",
+        "intl-tel-input": "17.0.8",
         "jquery": "3.5.1",
         "jquery-color": "2.2.0",
         "jquery-form": "4.2.2",
