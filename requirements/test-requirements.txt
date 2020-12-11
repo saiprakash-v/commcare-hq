@@ -43,7 +43,7 @@ django-celery-results==1.0.4  # via -r requirements.in
 django-compressor==2.1    # via -r requirements.in
 django-countries==4.6     # via -r requirements.in
 django-crispy-forms==1.10.0  # via -r requirements.in
-django-cte==1.1.4         # via -r requirements.in
+django-cte==1.1.5         # via -r requirements.in
 django-formtools==2.1     # via -r requirements.in, django-two-factor-auth
 django-logentry-admin==1.0.6  # via -r requirements.in
 https://github.com/dimagi/django-nose/raw/fast-first-1.4.6.1/releases/django_nose-1.4.6.1-py2.py3-none-any.whl  # via -r test-requirements.in
