@@ -69,7 +69,7 @@
         "knockout": "3.5.1",
         "knockout-validation": "Knockout-Contrib/Knockout-Validation#2.0.4",
         "leaflet": "0.7.7",
-        "less": "3.10.3",
+        "less": "4.1.1",
         "marionette.approuter": "^1.0.2",
         "markdown-it": "7.0.1",
         "modernizr": "^3.11.3",
